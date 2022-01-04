@@ -7,7 +7,7 @@
 #include "utils.h"
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 thrd_t thread_start(int (*runnable)(void *args), void *args) 
 {
   thrd_t tid;

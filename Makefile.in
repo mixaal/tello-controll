@@ -1,11 +1,11 @@
-CC=gcc
-#CC=g++
+CC=@CC@
+#CC=@CXX@
 FLAGS=-O2 -ggdb -pedantic -Wall -Werror -Wno-deprecated-declarations 
 NO_PEDANTIC_FLAGS=-O2 -ggdb -Wall -Werror -Wno-deprecated-declarations 
 RM=rm -f
 OBJECTS=tello.o main.o utils.o decoder.o sdl.o joy.o wifi_scan.o wireless.o
 MAIN=tello_control
-LIBS=-lSDL2_mixer -lSDL2_image -lSDL2 -lpthread -lavutil -lavcodec -lm -lmnl 
+LIBS=@LIBS@
 
 
 all: $(OBJECTS)

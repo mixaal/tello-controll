@@ -15,6 +15,10 @@ static Uint8 getalpha(SDL_Surface *surface, int x, int y) ;
 #define min(a,b) ((a)>(b)) ? (b) : (a)
 #define max(a,b) ((a)>(b)) ? (a) : (b)
 
+static Uint32 game_time;
+static Uint32 last_modulo;
+static int sdl_blink = 0;
+
 void sdl_setup(const char *title, int w, int h)
 {
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0){
@@ -85,6 +89,12 @@ while (!quit){
 
     SDL_SetRenderDrawColor(ren, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ren);
+    game_time = SDL_GetTicks();
+    int current_modulo = game_time % 500;
+    if(current_modulo < last_modulo) {
+          sdl_blink^=1;
+    }
+    last_modulo = game_time % 500;
     render_func();
     SDL_RenderPresent(ren);
   }
@@ -339,6 +349,18 @@ void sdl_draw_rect(int x, int y, int w, int h, int r, int g, int b)
   SDL_RenderFillRect(ren, &rect);
 } 
 
+void sdl_draw_box(int x, int y, int w, int h, int r, int g, int b)
+{
+  SDL_Rect rect;
+  rect.x = x;
+  rect.y = y;
+  rect.w = w;
+  rect.h = h;
+  SDL_SetRenderDrawColor(ren, r, g, b, SDL_ALPHA_OPAQUE);
+  SDL_RenderDrawRect(ren, &rect);
+} 
+
+
 Mix_Chunk *sdl_load_sfx(const char *path)
 {
   Mix_Chunk *chunk = Mix_LoadWAV(path);
@@ -366,20 +388,56 @@ void sdl_play_music(const char *path)
   Mix_PlayMusic(music, -1);
 }
 
+void sdl_wifi_signal_strength(int strength)
+{
+	int w=10, h=10;
+	int y=10+3*h;
+	int hh = h;
+	int xx = screenWidth - 4*w*3/2;
+	int r=255, g=255, b=255;
+	int or=255, og=255, ob=255;
+        int draw_white = 4;
+	if(strength<-67) {
+		if(sdl_blink) return; // don't draw anything
+		draw_white = 0;
+		or = 255; og = ob = 0;
+	}
+	if(strength>=-67 && strength<-60) {
+		if(sdl_blink) return; // don't draw anything
+		draw_white = 1;
+		or = 255; og = ob = 0;
+		r = 255; g = b = 0;
+	}
+	if(strength>=-60 && strength<-50) draw_white = 2;
+	if(strength>=-50 && strength<-40) draw_white = 3;
+	for (int i=0; i<4; i++) {
+	   if(i<draw_white) {
+	      sdl_draw_rect(xx, y, w, hh, r, g, b);
+	   } else {
+	      sdl_draw_rect(xx, y, w, hh, 0, 0, 0);
+	   }
+	   sdl_draw_box(xx, y, w, hh, or, og, ob);
+	   xx+=w*3/2;
+	   y-=h;
+	   hh+=h;
+	}
+}
+
 void sdl_battery_status(int power)
 {
 	if(power<0) power = 0;
 	if(power>100) power = 100;
+	if(power <=25 && sdl_blink) return;
 	int w=110, h=40;
 	if(screenWidth<800 && screenHeight<600) {
 		w = 50; h= 20;
 	}
-
+	
 	sdl_draw_rect(10, 10, w, h, 0, 0, 255);
 	int r = 255;
 	int g=  0;
 	int b = 0;
-	if(power>30) {
+	if(power>25) {
 		r = g= 255;
 		b = 0;
 	}

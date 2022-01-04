@@ -85,7 +85,7 @@ void tello_init(const char *tello_ip, int tello_port, int video_port)
 }
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 int api_activate_again(void *a)
 #else
 void * api_activate_again(void *a)
@@ -115,7 +115,7 @@ static void append_file(const char *filename, char *buf, size_t nbytes)
 }
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 int video_receive_thread(void *a)
 #else
 void * video_receive_thread(void *a)
@@ -146,14 +146,14 @@ void * video_receive_thread(void *a)
 
 		}
 	}
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 	return 0;
 #else
 	return NULL;
 #endif /* __cplusplus */
 }
  
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 int comm_receive_thread(void *a)
 #else
 void * comm_receive_thread(void *a)
@@ -188,7 +188,7 @@ void * comm_receive_thread(void *a)
 		}
 
 	}
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 	return 0;
 #else
 	return NULL;

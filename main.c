@@ -3,6 +3,7 @@
 #include "decoder.h"
 #include "sdl.h"
 #include "joy.h"
+#include "wireless.h"
 #include <stdio.h>
 
 extern unsigned char *frame_data;
@@ -18,12 +19,13 @@ static SDL_Texture *tex = NULL;
 static void render_func(void)
 {
 	sdl_battery_status(tello_battery_power);
+	sdl_wifi_signal_strength(-65);
 	if(frame_data!=NULL && tex!=NULL) {
             sdl_render_texture(tex, frame_data, frame_data_width, frame_data_height, SCR_W, SCR_H);
 	}
 }
 
-static void joy_button_down(int button)
+static void joy_button_down(joy_index_t button)
 {
 	switch(button) {
 		case JOY_START_BTN:
@@ -62,12 +64,15 @@ static void joy_button_down(int button)
 		case JOY_ZL_BTN:
 			printf("zl pressed\n");
 			break;
+		case JOY_UNKNOWN_BTN:
+			printf("Unknown\n");
+			break;
 	}
 
 }
 
 
-static void joy_button_up(int button)
+static void joy_button_up(joy_index_t button)
 {
 	switch(button) {
 		case JOY_START_BTN:
@@ -100,21 +105,28 @@ static void joy_button_up(int button)
 		case JOY_ZL_BTN:
 			printf("zl release\n");
 			break;
+		case JOY_UNKNOWN_BTN:
+			printf("Unknown\n");
+			break;
 	}
 
 
 }
 
+static void joy_axes(size_t axes, short x, short y)
+{
+}
 
-#ifdef __cplusplus
+
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 static int handle_joy(void *arg)
 #else
 static void *handle_joy(void *arg)
 #endif
 {
-  joy_loop("/dev/input/js0", joy_button_down, joy_button_up);	
+  joy_loop("/dev/input/js0", joy_button_down, joy_button_up, joy_axes);	
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
   return 0;
 #else
   return NULL;
@@ -122,7 +134,7 @@ static void *handle_joy(void *arg)
 }
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 static int handle_stats(void *arg)
 #else
 static void *handle_stats(void *arg)
@@ -139,7 +151,7 @@ static void *handle_stats(void *arg)
 	}
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
   return 0;
 #else
   return NULL;
@@ -156,6 +168,13 @@ static void key_down(SDL_Keycode key)
 }
 int main(int argc, char **argv)
 {
+//  wireless_scan_all("wlxf4ec38895f5a");
+  //
+ // int wifi_socket = wifi_find();
+ // if(wifi_socket<0) {
+//	  fprintf(stderr, "can't find wifi interface\n");
+//	  exit(-1);
+  //}
   decoder_init();
   tello_init((const char *)"192.168.10.1", 8889, 11111);
   tello_stream_on();

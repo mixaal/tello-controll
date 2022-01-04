@@ -40,4 +40,6 @@ void sdl_play_music(const char *path);
 void sdl_render_texture(SDL_Texture *tex, unsigned char *data, int src_w, int src_h, int dst_w, int dst_h);
 SDL_Texture *create_texture(int w, int h);
 void sdl_battery_status(int power);
+void sdl_wifi_signal_strength(int strength);
+void sdl_draw_box(int x, int y, int w, int h, int r, int g, int b);
 #endif /* __NN_SDL_H__ */

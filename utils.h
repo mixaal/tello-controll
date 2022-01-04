@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include "myconfig.h"
+
 #define True 1
 #define False 0
 #ifndef __cplusplus
 typedef _Bool bool;
 #endif /* __cplusplus */
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 #include <threads.h>
 #include <mutex>
 typedef std::mutex sync_t;
@@ -21,7 +23,7 @@ typedef pthread_mutex_t sync_t;
 
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
 thrd_t thread_start(int (*runnable)(void *args), void *args);
 #else
 pthread_t thread_start(void * (*runnable)(void *args), void *args) ;

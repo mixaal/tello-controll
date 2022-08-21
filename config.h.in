@@ -18,6 +18,14 @@
 /* Define to 1 if you have the `avutil' library (-lavutil). */
 #undef HAVE_LIBAVUTIL
 
+
+/* Define to 1 if you have the `avif' library (-lavif). */
+#undef HAVE_LIBAVIF
+
+
+/* Define to 1 if you have the `mnl' library (-lmnl). */
+#undef HAVE_LIBMNL
+
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
@@ -45,6 +53,10 @@
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
+
+
+/* Define to 1 if you have the <linux/joystick.h> header file. */
+#undef HAVE_LINUX_JOYSTIK_H
 
 /* Define to 1 if you have the <pthread.h> header file. */
 #undef HAVE_PTHREAD_H

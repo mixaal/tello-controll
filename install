@@ -1,14 +1,59 @@
 #!/bin/bash -xe 
 
-sudo apt install libsdl2-dev -y
-sudo apt install libsdl2-image-dev -y
-sudo apt install libsdl2-mixer-dev -y
-sudo apt-get install libboost-all-dev -y
-sudo apt-get install libavcodec-dev -y
-sudo apt install libmnl-dev -y
 
-autoconf
-./configure
-make
+OS=$(uname -s)
+
+
+LDF=""
+INC=""
+function getlib
+{
+  X=$(find /opt/homebrew/Cellar/ -name "$1.*" | tail -1)
+  [ -z "$X" ] ||  { 
+     D=$(dirname "$X")
+     LDF="$LDF -L$D"
+     R=$(dirname "$D")
+     R="$R/include"
+     INC="$INC -I$R"
+  }
+}
+
+function addinc
+{
+  X=$(find /opt/homebrew/Cellar -name "$1" | tail -1)
+  [ -z "$X" ] || {
+    D=$(dirname "$X")
+    INC="$INC -I$D"
+  }
+}
+
+if [ "$OS" = "Linux" ] ; then
+  sudo apt install libsdl2-dev -y
+  sudo apt install libsdl2-image-dev -y
+  sudo apt install libsdl2-mixer-dev -y
+  sudo apt-get install libboost-all-dev -y
+  sudo apt-get install libavcodec-dev -y
+  sudo apt install libmnl-dev -y
+fi
+
+if [ "$OS" = "Darwin" ] ; then
+   brew install sdl2 sdl2_image sdl2_mixer sdl2_sound sdl2_gfx libavif
+   getlib libSDL2
+   getlib libSDL2_image
+   getlib libSDL2_mixer
+   getlib libSDL2_sound
+   getlib libSDL2_gfx
+   getlib libavif
+   addinc SDL.h
+fi
+
+
+
+
+
+
+#autoconf
+./configure LDFLAGS="$LDF" CFLAGS="$INC"
+#make
 
 

@@ -1,15 +1,15 @@
 CC=@CC@
 #CC=@CXX@
-FLAGS=-O2 -ggdb -pedantic -Wall -Werror -Wno-deprecated-declarations 
+FLAGS=-O2 -ggdb -pedantic -Wall -Werror -Wno-deprecated-declarations  @CFLAGS@
 NO_PEDANTIC_FLAGS=-O2 -ggdb -Wall -Werror -Wno-deprecated-declarations 
 RM=rm -f
-OBJECTS=tello.o main.o utils.o decoder.o sdl.o joy.o wifi_scan.o wireless.o
+OBJECTS=tello.o main.o utils.o decoder.o sdl.o joy.o wifi_scan.o # wireless.o
 MAIN=tello_control
 LIBS=@LIBS@
 
 
 all: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $(MAIN) $(LIBS)
+	$(CC) $(OBJECTS) -o $(MAIN) $(LIBS) @LDFLAGS@
 
 wireless.o: wireless.c
 	$(CC) $(FLAGS) -Wno-stringop-truncation -c -o $@ $<

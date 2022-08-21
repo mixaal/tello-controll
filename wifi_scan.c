@@ -37,7 +37,7 @@
   * validate function simplifies common tasks (validates each attribute against table specifying what is valid)
   *
   */
-
+#ifdef HAVE_LIBMNL
 #include "wifi_scan.h"
 
 #include <libmnl/libmnl.h> //netlink libmnl
@@ -895,4 +895,4 @@ static void die_errno(const char *s)
     perror(s);
     exit(1);
 }
-
+#endif

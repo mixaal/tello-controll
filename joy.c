@@ -1,4 +1,6 @@
+#ifdef HAVE_LINUX_JOYSTICK_H_
 #include <linux/joystick.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,12 +16,14 @@ struct axis_state {
     short x, y;
 };
 
+#ifdef HAVE_LINUX_JOYSTICK_H_
 static const char *joy_name = NULL;
 
 static int gamehat_mapping[] = {11, 10, 0, 1, 3, 4, -1, -1, 6, 7};
 static int ps3_android__mapping[] = {9, 8, 1, 2, 0, 3, 5, 4, 7, 6};
 
 // Thanks to : https://gist.github.com/jasonwhite/c5b2048c15993d285130
+
 
 static int read_event(int fd, struct js_event *event)
 {
@@ -132,3 +136,4 @@ void joy_loop(const char *device, joy_button_func_t button_up, joy_button_func_t
 
     close(js);
 }
+#endif

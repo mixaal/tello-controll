@@ -25,8 +25,9 @@ AC_TYPE_SSIZE_T
 
 
 AC_CHECK_LIB(mnl,  main, [], [
+   echo "Error - you need wireless lib: sudo apt install libmnl-dev"
+   exit -1
 ])
-
 
 AC_CHECK_LIB(m,  main, [], [
    echo "Error - you need math lib!"
@@ -34,8 +35,12 @@ AC_CHECK_LIB(m,  main, [], [
 ])
 
 
-AC_CHECK_LIB(avif,  main, [], [
-   echo "Error - you need avif lib - brew install libavif"
+AC_CHECK_LIB(avcodec,  main, [], [
+   echo "Error - you need avcodec lib!"
+   exit -1
+])
+AC_CHECK_LIB(avutil,  main, [], [
+   echo "Error - you need avutil lib!"
    exit -1
 ])
 

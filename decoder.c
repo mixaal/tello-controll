@@ -2,6 +2,12 @@
 #include "utils.h"
 #include "sdl.h"
 
+
+
+#ifdef HAVE_LIBAVCODEC
+static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consumed, bool *is_frame_available);
+static AVFrame* decoder_decode_frame(void);
+
 #define INBUF_SIZE 4096
 #define AUDIO_INBUF_SIZE 20480
 #define AUDIO_REFILL_THRESH 4096
@@ -61,7 +67,7 @@ ssize_t decoder_parse(const unsigned char* in_data, ssize_t in_size)
   return nread;
 }
 
-AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consumed, bool *is_frame_available)
+static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consumed, bool *is_frame_available)
 {
   *num_consumed = decoder_parse((const unsigned char*)data_in, len);
   //fprintf(stderr, "num consumed=%ld\n", *num_consumed);
@@ -106,7 +112,7 @@ AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consum
   }
 }
 
-AVFrame* decoder_decode_frame(void)
+static AVFrame* decoder_decode_frame(void)
 {
   int got_picture = 0;
   //printf("decoder_decode_frame: frame=%p\n", frame);
@@ -222,4 +228,27 @@ static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
         fwrite(buf + i * wrap, 1, xsize, f);
     fclose(f);
 }
+
+
+#endif /* HAVE_LIBAVCODEC */
+
+#ifdef HAVE_LIBAVIF
+void decode(const char *data_in, ssize_t len) 
+{
+
+}
+
+
+void decoder_destroy(void) 
+{
+}
+
+
+void decoder_init(void)
+{
+}
+#endif /* HAVE_LIBAVIF */
+
+
+
 

@@ -4125,14 +4125,13 @@ else
 fi
 
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lavif" >&5
-$as_echo_n "checking for main in -lavif... " >&6; }
-if ${ac_cv_lib_avif_main+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lz" >&5
+$as_echo_n "checking for main in -lz... " >&6; }
+if ${ac_cv_lib_z_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lavif  $LIBS"
+LIBS="-lz  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4146,29 +4145,254 @@ return main ();
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_avif_main=yes
+  ac_cv_lib_z_main=yes
 else
-  ac_cv_lib_avif_main=no
+  ac_cv_lib_z_main=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_avif_main" >&5
-$as_echo "$ac_cv_lib_avif_main" >&6; }
-if test "x$ac_cv_lib_avif_main" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_main" >&5
+$as_echo "$ac_cv_lib_z_main" >&6; }
+if test "x$ac_cv_lib_z_main" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBAVIF 1
+#define HAVE_LIBZ 1
 _ACEOF
 
-  LIBS="-lavif $LIBS"
+  LIBS="-lz $LIBS"
 
 else
 
-   echo "Error - you need avif lib - brew install libavif"
+   echo "Error - you need zlib!"
    exit -1
 
 fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lavcodec" >&5
+$as_echo_n "checking for main in -lavcodec... " >&6; }
+if ${ac_cv_lib_avcodec_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lavcodec  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_avcodec_main=yes
+else
+  ac_cv_lib_avcodec_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_avcodec_main" >&5
+$as_echo "$ac_cv_lib_avcodec_main" >&6; }
+if test "x$ac_cv_lib_avcodec_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAVCODEC 1
+_ACEOF
+
+  LIBS="-lavcodec $LIBS"
+
+else
+
+   echo "Error - you need avcodec lib!"
+   exit -1
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lavfilter" >&5
+$as_echo_n "checking for main in -lavfilter... " >&6; }
+if ${ac_cv_lib_avfilter_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lavfilter  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_avfilter_main=yes
+else
+  ac_cv_lib_avfilter_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_avfilter_main" >&5
+$as_echo "$ac_cv_lib_avfilter_main" >&6; }
+if test "x$ac_cv_lib_avfilter_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAVFILTER 1
+_ACEOF
+
+  LIBS="-lavfilter $LIBS"
+
+else
+
+   echo "Error - you need avfilter lib!"
+   exit -1
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lavresample" >&5
+$as_echo_n "checking for main in -lavresample... " >&6; }
+if ${ac_cv_lib_avresample_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lavresample  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_avresample_main=yes
+else
+  ac_cv_lib_avresample_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_avresample_main" >&5
+$as_echo "$ac_cv_lib_avresample_main" >&6; }
+if test "x$ac_cv_lib_avresample_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAVRESAMPLE 1
+_ACEOF
+
+  LIBS="-lavresample $LIBS"
+
+else
+
+   echo "Error - you need avresample lib!"
+   exit -1
+
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lswscale" >&5
+$as_echo_n "checking for main in -lswscale... " >&6; }
+if ${ac_cv_lib_swscale_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lswscale  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_swscale_main=yes
+else
+  ac_cv_lib_swscale_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_swscale_main" >&5
+$as_echo "$ac_cv_lib_swscale_main" >&6; }
+if test "x$ac_cv_lib_swscale_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSWSCALE 1
+_ACEOF
+
+  LIBS="-lswscale $LIBS"
+
+else
+
+   echo "Error - you need swscale lib!"
+   exit -1
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lavutil" >&5
+$as_echo_n "checking for main in -lavutil... " >&6; }
+if ${ac_cv_lib_avutil_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lavutil  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_avutil_main=yes
+else
+  ac_cv_lib_avutil_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_avutil_main" >&5
+$as_echo "$ac_cv_lib_avutil_main" >&6; }
+if test "x$ac_cv_lib_avutil_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBAVUTIL 1
+_ACEOF
+
+  LIBS="-lavutil $LIBS"
+
+else
+
+   echo "Error - you need avutil lib!"
+   exit -1
+
+fi
+
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpthread" >&5

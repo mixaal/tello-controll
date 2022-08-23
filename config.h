@@ -14,14 +14,14 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `avcodec' library (-lavcodec). */
-/* #undef HAVE_LIBAVCODEC */
+#define HAVE_LIBAVCODEC 1
 
 /* Define to 1 if you have the `avutil' library (-lavutil). */
-/* #undef HAVE_LIBAVUTIL */
+#define HAVE_LIBAVUTIL 1
 
 
 /* Define to 1 if you have the `avif' library (-lavif). */
-#define HAVE_LIBAVIF 1
+/* #undef HAVE_LIBAVIF */
 
 
 /* Define to 1 if you have the `mnl' library (-lmnl). */

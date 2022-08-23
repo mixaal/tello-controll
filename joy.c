@@ -136,4 +136,11 @@ void joy_loop(const char *device, joy_button_func_t button_up, joy_button_func_t
 
     close(js);
 }
+#else /* use sdl */
+
+void joy_loop(const char *device, joy_button_func_t button_up, joy_button_func_t button_down, joy_axis_func_t axis_func)
+{
+   
+}
+
 #endif

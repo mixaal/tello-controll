@@ -2,17 +2,6 @@
 #include "utils.h"
 #include "sdl.h"
 
-
-
-#ifdef HAVE_LIBAVCODEC
-static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consumed, bool *is_frame_available);
-static AVFrame* decoder_decode_frame(void);
-
-#define INBUF_SIZE 4096
-#define AUDIO_INBUF_SIZE 20480
-#define AUDIO_REFILL_THRESH 4096
-
-
 unsigned char *frame_data = NULL;
 int frame_data_width, frame_data_height;
 static sync_t frame_access_lock;
@@ -27,6 +16,17 @@ void frame_access_release(void)
 {
 	unlock(&frame_access_lock);
 }
+
+
+#ifdef HAVE_LIBAVCODEC
+static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num_consumed, bool *is_frame_available);
+static AVFrame* decoder_decode_frame(void);
+
+#define INBUF_SIZE 4096
+#define AUDIO_INBUF_SIZE 20480
+#define AUDIO_REFILL_THRESH 4096
+
+
 
 static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize, 
                      char *filename);
@@ -81,7 +81,7 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
     int wrap = frame->linesize[0];
     int xsize = frame->width;
     int ysize = frame->height;
-    frame_access_gain();
+    //frame_access_gain();
     if(frame_data == NULL) {
 	    frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
             frame_data_width = xsize;
@@ -100,12 +100,12 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
     int dst = 0;
     for (int y = 0; y< ysize; y++) {
        for (int x = 0; x< xsize; x++) {
-           frame_data[dst++] = *(src_data + y * wrap + x);
-           frame_data[dst++] = *(src_data + y * wrap + x);
-           frame_data[dst++] = *(src_data + y * wrap + x);
+           frame_data[dst++] = 0; // *(src_data + y * wrap + x);
+           frame_data[dst++] = *(src_data + y * wrap + x + 1);
+           frame_data[dst++] = 0; // *(src_data + y * wrap + x + 2);
        }
     }
-    frame_access_release();
+    //frame_access_release();
     return frame;
   } else {
 	  return NULL;
@@ -232,10 +232,103 @@ static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
 
 #endif /* HAVE_LIBAVCODEC */
 
+#if 0
 #ifdef HAVE_LIBAVIF
+
+
 void decode(const char *data_in, ssize_t len) 
 {
+   avifRGBImage rgb;
+    memset(&rgb, 0, sizeof(rgb));
+  avifDecoder * decoder = avifDecoderCreate();
+  avifResult result = avifDecoderSetIOMemory(decoder, (unsigned char *)data_in, len);
+    if (result != AVIF_RESULT_OK) {
+        perror("avifDecoderSetIOMemory()");
+        goto cleanup;
+    }
 
+    result = avifDecoderParse(decoder);
+#if 0
+    if (result != AVIF_RESULT_OK) {
+        fprintf(stderr, "Failed to decode image: %s\n", avifResultToString(result));
+        goto cleanup;
+    }
+#endif
+
+    // Now available:
+    // * All decoder->image information other than pixel data:
+    //   * width, height, depth
+    //   * transformations (pasp, clap, irot, imir)
+    //   * color profile (icc, CICP)
+    //   * metadata (Exif, XMP)
+    // * decoder->alphaPresent
+    // * number of total images in the AVIF (decoder->imageCount)
+    // * overall image sequence timing (including per-frame timing with avifDecoderNthImageTiming())
+
+    int xsize = decoder->image->width;
+    int ysize = decoder->image->height;
+    printf("Parsed AVIF: %ux%u (%ubpc)\n", decoder->image->width, decoder->image->height, decoder->image->depth);
+
+    while (avifDecoderNextImage(decoder) == AVIF_RESULT_OK) {
+        // Now available (for this frame):
+        // * All decoder->image YUV pixel data (yuvFormat, yuvPlanes, yuvRange, yuvChromaSamplePosition, yuvRowBytes)
+        // * decoder->image alpha data (alphaPlane, alphaRowBytes)
+        // * this frame's sequence timing
+
+        avifRGBImageSetDefaults(&rgb, decoder->image);
+        // Override YUV(A)->RGB(A) defaults here: depth, format, chromaUpsampling, ignoreAlpha, alphaPremultiplied, libYUVUsage, etc
+
+        // Alternative: set rgb.pixels and rgb.rowBytes yourself, which should match your chosen rgb.format
+        // Be sure to use uint16_t* instead of uint8_t* for rgb.pixels/rgb.rowBytes if (rgb.depth > 8)
+        avifRGBImageAllocatePixels(&rgb);
+
+        if (avifImageYUVToRGB(decoder->image, &rgb) != AVIF_RESULT_OK) {
+            fprintf(stderr, "Conversion from YUV failed\n");
+            goto cleanup;
+        }
+
+        // Now available:
+        // * RGB(A) pixel data (rgb.pixels, rgb.rowBytes)
+
+        if (rgb.depth > 8) {
+            fprintf(stderr, "only 8bit depth supported, current depth: %d\n", rgb.depth);
+            goto cleanup;
+        }
+        uint8_t * firstPixel = rgb.pixels;
+        printf(" * First pixel: RGBA(%u,%u,%u,%u)\n", firstPixel[0], firstPixel[1], firstPixel[2], firstPixel[3]);
+
+        unsigned char *src_data = firstPixel;
+        //frame_access_gain();
+        if(frame_data == NULL) {
+	    frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
+            frame_data_width = xsize;
+            frame_data_height = ysize;
+       } else {
+	    if(xsize!=frame_data_width || ysize!=frame_data_height) {
+		fprintf(stderr, "resolution has changed from %dx%d -> %dx%d\n", frame_data_width, frame_data_height, xsize, ysize);
+		free(frame_data);
+                frame_data_width = xsize;
+                frame_data_height = ysize;
+	        frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
+	    }
+       } 
+       
+    int dst = 0;
+    for (int y = 0; y< ysize; y++) {
+       for (int x = 0; x< xsize; x++) {
+           frame_data[dst++] = *(src_data + y * xsize + x);
+           frame_data[dst++] = *(src_data + y * xsize + x);
+           frame_data[dst++] = *(src_data + y * xsize + x);
+       }
+    }
+    //frame_access_release();
+
+ 
+    }
+
+cleanup:
+    avifRGBImageFreePixels(&rgb); // Only use in conjunction with avifRGBImageAllocatePixels()
+    avifDecoderDestroy(decoder);
 }
 
 
@@ -248,6 +341,7 @@ void decoder_init(void)
 {
 }
 #endif /* HAVE_LIBAVIF */
+#endif
 
 
 

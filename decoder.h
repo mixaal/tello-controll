@@ -22,6 +22,10 @@ extern "C" {
 # include <libavutil/samplefmt.h>
 #endif
 
+#ifdef HAVE_LIBAVIF
+# include <avif/avif.h>
+#endif
+
 #ifdef __cplusplus
 }
 #endif

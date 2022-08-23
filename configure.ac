@@ -33,11 +33,35 @@ AC_CHECK_LIB(m,  main, [], [
    exit -1
 ])
 
-
-AC_CHECK_LIB(avif,  main, [], [
-   echo "Error - you need avif lib - brew install libavif"
+AC_CHECK_LIB(z,  main, [], [
+   echo "Error - you need zlib!"
    exit -1
 ])
+
+
+AC_CHECK_LIB(avcodec,  main, [], [
+   echo "Error - you need avcodec lib!"
+   exit -1
+])
+AC_CHECK_LIB(avfilter,  main, [], [
+   echo "Error - you need avfilter lib!"
+   exit -1
+])
+AC_CHECK_LIB(avresample,  main, [], [
+   echo "Error - you need avresample lib!"
+   exit -1
+])
+
+
+AC_CHECK_LIB(swscale,  main, [], [
+   echo "Error - you need swscale lib!"
+   exit -1
+])
+AC_CHECK_LIB(avutil,  main, [], [
+   echo "Error - you need avutil lib!"
+   exit -1
+])
+
 
 AC_CHECK_LIB(pthread,  main, [], [
    echo "Error - you need pthread lib!"

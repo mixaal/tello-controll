@@ -27,6 +27,8 @@ function addinc
   }
 }
 
+FRAMEWORKS=""
+
 if [ "$OS" = "Linux" ] ; then
   sudo apt install libsdl2-dev -y
   sudo apt install libsdl2-image-dev -y
@@ -37,14 +39,30 @@ if [ "$OS" = "Linux" ] ; then
 fi
 
 if [ "$OS" = "Darwin" ] ; then
-   brew install sdl2 sdl2_image sdl2_mixer sdl2_sound sdl2_gfx libavif
+   brew install sdl2 sdl2_image sdl2_mixer sdl2_sound sdl2_gfx
    getlib libSDL2
    getlib libSDL2_image
    getlib libSDL2_mixer
    getlib libSDL2_sound
    getlib libSDL2_gfx
-   getlib libavif
    addinc SDL.h
+
+
+   [ -d "$HOME/build" ] || mkdir -p "$HOME/build"
+   cd "$HOME/build"
+
+   [ -d "$HOME/libav/lib" ] || {
+      curl -kv https://libav.org/releases/libav-12.3.tar.gz -o libav-12.3.tar.gz
+      tar xzvf libav-12.3.tar.gz
+      cd libav-12.3
+      ./configure --prefix=$HOME/libav
+       make
+       make install
+   }
+   cd -
+   LDF="$LDF -L$HOME/libav/lib"
+   INC="$INC -I$HOME/libav/include"
+   FRAMEWORKS="-framework CoreFoundation -framework CoreVideo -framework VideoDecodeAcceleration"
 fi
 
 
@@ -53,7 +71,7 @@ fi
 
 
 #autoconf
-./configure LDFLAGS="$LDF" CFLAGS="$INC"
+./configure LDFLAGS="$LDF $FRAMEWORKS" CFLAGS="$INC"
 #make
 
 

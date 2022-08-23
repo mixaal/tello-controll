@@ -4573,6 +4573,52 @@ else
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lSDL2_ttf" >&5
+$as_echo_n "checking for main in -lSDL2_ttf... " >&6; }
+if ${ac_cv_lib_SDL2_ttf_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lSDL2_ttf  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_SDL2_ttf_main=yes
+else
+  ac_cv_lib_SDL2_ttf_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_SDL2_ttf_main" >&5
+$as_echo "$ac_cv_lib_SDL2_ttf_main" >&6; }
+if test "x$ac_cv_lib_SDL2_ttf_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSDL2_TTF 1
+_ACEOF
+
+  LIBS="-lSDL2_ttf $LIBS"
+
+else
+
+   echo "Error - you need sdl2 ttf lib!"
+   exit -1
+
+fi
+
+
+
 ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF

@@ -19,12 +19,27 @@ static Uint32 game_time;
 static Uint32 last_modulo;
 static int sdl_blink = 0;
 
+static TTF_Font *Sans;
+static int start_point = 0;
+
 void sdl_setup(const char *title, int w, int h)
 {
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) != 0){
 		fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
 		exit(-1);
 	}
+
+        if(TTF_Init() < 0){
+           fprintf(stderr, "can't init ttf: %s\n", TTF_GetError());
+           exit(-1);
+        }
+
+        Sans = TTF_OpenFont("/Library/Fonts/OracleSans_Rg.ttf", 24);
+        if(Sans==NULL) {
+          fprintf(stderr, "can't open font : %s!\n", SDL_GetError());
+          return;
+        }
+
 
         if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 1024) < 0)
          {
@@ -71,6 +86,11 @@ void sdl_update(render_func_t render_func, kbd_func_t keyboard_down, kbd_func_t 
 {
 SDL_Event e;
 bool quit = 0;
+
+int xMouse, yMouse;
+
+int xs, ys, xe=-1, ye=-1;
+
 while (!quit){
     while (SDL_PollEvent(&e)){
         if (e.type == SDL_QUIT){
@@ -83,8 +103,31 @@ while (!quit){
               keyboard_up(e.key.keysym.sym);
         }
         if (e.type == SDL_MOUSEBUTTONDOWN){
-            quit = 1;
+            SDL_MouseButtonEvent *ev = (SDL_MouseButtonEvent *)&e;
+            if(ev->button == SDL_BUTTON_LEFT) {
+              start_point ^= 1;
+              if(start_point) {
+                  xs = xMouse;
+                  ys = yMouse;
+                  xe = ye = -1;
+              } else {
+                  xe = xMouse;
+                  ye = yMouse;
+              }
+            } 
+            if(ev->button == SDL_BUTTON_RIGHT) {
+                xe = ye = -1;
+            }
         }
+        if(start_point) {
+           xe = xMouse; 
+           ye = yMouse;
+        }
+        if(e.type == SDL_MOUSEMOTION)
+        {
+            SDL_GetMouseState(&xMouse,&yMouse);
+        }
+        printf("xs=%d, ys=%d    xe=%d ye=%d\n", xs, ys, xe, ye);
     }
 
     SDL_SetRenderDrawColor(ren, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -96,6 +139,8 @@ while (!quit){
     }
     last_modulo = game_time % 500;
     render_func();
+    if(xe>0 && ye>0) 
+       sdl_draw_box(xs, ys, xe-xs, ye-ys, 255, 255, 0);
     SDL_RenderPresent(ren);
   }
 }
@@ -450,6 +495,47 @@ void sdl_battery_status(int power)
 	sdl_draw_rect(10+w, 10+h/4, h/5, h/2, 0, 0, 255);
 }
 
+
+void sdl_text(const char *message, int x, int y, int w, int h)
+{
+//this opens a font style and sets a size
+
+// this is the color in rgb format,
+// maxing out all would give you the color white,
+// and it will be your text's color
+SDL_Color Yellow = {255, 255, 0};
+
+// as TTF_RenderText_Solid could only be used on
+// SDL_Surface then you have to create the surface first
+SDL_Surface* surfaceMessage =
+    TTF_RenderText_Solid(Sans, message, Yellow); 
+
+// now you can convert it into a texture
+SDL_Texture* Message = SDL_CreateTextureFromSurface(ren, surfaceMessage);
+
+SDL_Rect Message_rect; //create a rect
+Message_rect.x = x;  //controls the rect's x coordinate 
+Message_rect.y = y; // controls the rect's y coordinte
+Message_rect.w = w; // controls the width of the rect
+Message_rect.h = h; // controls the height of the rect
+
+// (0,0) is on the top left of the window/screen,
+// think a rect as the text's box,
+// that way it would be very simple to understand
+
+// Now since it's a texture, you have to put RenderCopy
+// in your game loop area, the area where the whole code executes
+
+// you put the renderer's name first, the Message,
+// the crop size (you can ignore this if you don't want
+// to dabble with cropping), and the rect which is the size
+// and coordinate of your texture
+SDL_RenderCopy(ren, Message, NULL, &Message_rect);
+
+// Don't forget to free your surface and texture
+SDL_FreeSurface(surfaceMessage);
+SDL_DestroyTexture(Message);
+}
 
 void sdl_quit(void)
 {

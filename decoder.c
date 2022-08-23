@@ -6,6 +6,20 @@ unsigned char *frame_data = NULL;
 int frame_data_width, frame_data_height;
 static sync_t frame_access_lock;
 
+typedef enum { RMODE_GREEN, RMODE_BW } render_mode_t;
+static render_mode_t render_mode = RMODE_BW;
+
+
+void render_green(void)
+{
+  render_mode = RMODE_GREEN;
+}
+
+void render_bw(void)
+{
+  render_mode = RMODE_BW;
+}
+
 
 void frame_access_gain(void)
 {
@@ -100,9 +114,18 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
     int dst = 0;
     for (int y = 0; y< ysize; y++) {
        for (int x = 0; x< xsize; x++) {
-           frame_data[dst++] = 0; // *(src_data + y * wrap + x);
-           frame_data[dst++] = *(src_data + y * wrap + x + 1);
-           frame_data[dst++] = 0; // *(src_data + y * wrap + x + 2);
+           switch (render_mode) {
+             case RMODE_BW:
+               frame_data[dst++] = *(src_data + y * wrap + x);
+               frame_data[dst++] = *(src_data + y * wrap + x);
+               frame_data[dst++] = *(src_data + y * wrap + x);
+               break;
+             case RMODE_GREEN:
+               frame_data[dst++] = 0; 
+               frame_data[dst++] = *(src_data + y * wrap + x);
+               frame_data[dst++] = 0; 
+               break;
+           }
        }
     }
     //frame_access_release();

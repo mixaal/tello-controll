@@ -12,16 +12,20 @@
 #include "utils.h"
 #include "decoder.h"
 
-static tello_config_t tello_config = { 8889, (char*)"192.168.10.1", 0.3f, 0, 11111 };
-
+static tello_config_t tello_config = { 8889, 8890, (char*)"192.168.10.1", 0.3f, 0, 11111 };
+static const char *tello_state_cmd = "pitch:%d;roll:%d;yaw:%d;vgx:%d;vgy%d;vgz:%d;templ:%d;temph:%d;tof:%d;h:%d;bat:%d;baro:%.2f;time:%d;agx:%.2f;agy:%.2f;agz:%.2f;\r\n";
 
 static int comm_socket;
 static int video_socket;
+static int state_socket;
 static struct sockaddr_in comm_addr;
 static struct sockaddr_in video_recv__addr;
+static struct sockaddr_in state_addr;
 
 
-int tello_battery_power;
+tello_state_t tello_state;
+
+
 
 
 #define MAX_VIDEO_SZ 262144
@@ -40,14 +44,20 @@ static void send_command(const char *cmd)
 	sendto(comm_socket, cmd, strlen(cmd), 0, (struct sockaddr *) &snd_addr, sizeof(snd_addr));
 }
 
-void tello_init(const char *tello_ip, int tello_port, int video_port)
+void tello_init(const char *tello_ip, int tello_port, int video_port, int tello_state_port)
 {
   const char *local_ip=(const char *)"0.0.0.0";
   tello_config.tello_ip = new_string(tello_ip);
   tello_config.tello_port = tello_port;
   tello_config.video_port = video_port;
+  tello_config.tello_state_port = tello_state_port;
   comm_socket = socket(AF_INET, SOCK_DGRAM, 0);
   if(comm_socket<0) {
+	 perror("socket()");
+	 exit(-1);
+  }
+  state_socket = socket(AF_INET, SOCK_DGRAM, 0);
+  if(state_socket<0) {
 	 perror("socket()");
 	 exit(-1);
   }
@@ -66,6 +76,19 @@ void tello_init(const char *tello_ip, int tello_port, int video_port)
 	  close(comm_socket);
 	  exit(-1);
   }
+  state_addr.sin_family = AF_INET;
+  state_addr.sin_port = htons(tello_state_port);
+  inet_aton(local_ip, &comm_addr.sin_addr);
+  fprintf(stderr, "bind socket to %s:%d ...\n", local_ip, tello_state_port);
+  rc = bind(state_socket, (struct sockaddr *) &state_addr, sizeof(state_addr));
+  if(rc<0) {
+	  perror("bind()");
+	  close(comm_socket);
+	  close(state_socket);
+	  exit(-1);
+  }
+
+
 
   video_recv__addr.sin_family = AF_INET;
   video_recv__addr.sin_port = htons(video_port);
@@ -74,11 +97,14 @@ void tello_init(const char *tello_ip, int tello_port, int video_port)
   rc = bind(video_socket, (struct sockaddr *) &video_recv__addr, sizeof(video_recv__addr));
   if(rc<0) {
 	  close(video_socket);
+	  close(state_socket);
+	  close(comm_socket);
 	  perror("bind()");
 	  exit(-1);
   }
 
   thread_start(comm_receive_thread, NULL);
+  thread_start(state_receive_thread, NULL);
   thread_start(video_receive_thread, NULL);
   thread_start(api_activate_again, NULL);
   send_command("command");
@@ -114,6 +140,61 @@ static void append_file(const char *filename, char *buf, size_t nbytes)
 	fclose(fp);
 }
 #endif
+
+
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
+int state_receive_thread(void *a)
+#else
+void * state_receive_thread(void *a)
+#endif /* __cplusplus */
+{
+
+	char buf[3000];
+	fprintf(stderr, "Starting state receive thread from %s:%d...\n", tello_config.tello_ip, tello_config.tello_state_port);
+
+	for(;;) {
+		ssize_t nbytes = recv(state_socket, buf, 3000, 0);
+		if(nbytes<0) {
+			perror("state recv():");
+		}
+		fprintf(stderr, "state: nbytes=%ld\n", nbytes);
+		if(nbytes>0) {
+			// Decode stuff
+			fprintf(stderr, "state received: %ld bytes of communication\n", nbytes);
+			char *response = new_string_sz(buf, nbytes);
+			chomp(response);
+			printf("*** STATE: %s\n", response);
+                        sscanf(response, tello_state_cmd, 
+                                   &tello_state.pitch,
+                                   &tello_state.roll,
+                                   &tello_state.yaw,
+                                   &tello_state.vgx,
+                                   &tello_state.vgy,
+                                   &tello_state.vgz,
+                                   &tello_state.templ,
+                                   &tello_state.temph,
+                                   &tello_state.tof,
+                                   &tello_state.height,
+                                   &tello_state.battery,
+                                   &tello_state.alt,
+                                   &tello_state.flight_time,
+                                   &tello_state.agx,
+                                   &tello_state.agy,
+                                   &tello_state.agz);
+			fprintf(stderr, "received: |%s|\n", response);
+			free(response);
+		}
+
+	}
+
+
+#if defined( __cplusplus) && defined(HAVE_THREADS_H)
+return 0;
+#else
+return NULL;
+#endif /* __cplusplus */
+}
+
 
 #if defined( __cplusplus) && defined(HAVE_THREADS_H)
 int video_receive_thread(void *a)
@@ -173,16 +254,20 @@ void * comm_receive_thread(void *a)
 			fprintf(stderr, "received: %ld bytes of communication\n", nbytes);
 			char *response = new_string_sz(buf, nbytes);
 			chomp(response);
+#if 0
 			if(endswith(response, "s")) {
+                                sscanf(response, "%ds", &tello_fly_time);
 				printf("Flight time: %s\n", response);
 			}	
 			if(endswith(response, "dm")) {
+                                sscanf(response, "%ddm", &tello_height);
 				printf("Height: %s\n", response);
 			}
 			if(only_digits(response)) {
 				printf("Battery: %s\n", response);
 				tello_battery_power = atoi(response);
 			}
+#endif
 			fprintf(stderr, "received: |%s|\n", response);
 			free(response);
 		}
@@ -268,6 +353,11 @@ void tello_get_height(void)
 void tello_get_battery(void)
 {
     send_command("battery?");
+}
+
+void tello_get_wifi_snr(void)
+{
+    send_command("wifi?");
 }
 
 

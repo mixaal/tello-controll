@@ -3,26 +3,44 @@
 #include "decoder.h"
 #include "sdl.h"
 #include "joy.h"
+#include "console.h"
 #include "wireless.h"
 #include <stdio.h>
 
 extern unsigned char *frame_data;
 extern int frame_data_width;
 extern int frame_data_height;
-extern int tello_battery_power;
+
+extern tello_state_t tello_state;
+
 
 static SDL_Texture *tex = NULL;
 
 #define SCR_W 1920
 #define SCR_H 1080
 
+static int font_width = 10;
+static int font_height = 20;
+static void tello_state_render(void)
+{
+        char msg[4096];
+        snprintf(msg, 256, "ALT: %.2f     H:%d     TEMPL:%d     TEMPH:%d       TIME:%d        TOF:%d", tello_state.alt, tello_state.height, tello_state.templ, tello_state.temph, tello_state.flight_time, tello_state.tof);
+        sdl_text(msg, 140, 20, strlen(msg)*font_width, font_height);
+        snprintf(msg, 256, "VGX: %d VGY:%d VGZ:%d          AGX:%.2f AGY:%.2f AGZ:%.2f", tello_state.vgx, tello_state.vgy, tello_state.vgz, tello_state.agx, tello_state.agy, tello_state.agz);
+        sdl_text(msg, 140, 50, strlen(msg)*font_width, font_height);
+        snprintf(msg, 256, "PITCH:%d      ROLL:%d          YAW:%d", tello_state.pitch, tello_state.roll, tello_state.yaw);
+        sdl_text(msg, 140, 80, strlen(msg)*font_width, font_height);
+}
+
 static void render_func(void)
 {
-	sdl_battery_status(tello_battery_power);
+	sdl_battery_status(tello_state.battery);
 	sdl_wifi_signal_strength(-65);
 	if(frame_data!=NULL && tex!=NULL) {
             sdl_render_texture(tex, frame_data, frame_data_width, frame_data_height, SCR_W, SCR_H);
 	}
+        tello_state_render();
+        console_render();
 }
 
 static void joy_button_down(joy_index_t button)
@@ -142,11 +160,7 @@ static void *handle_stats(void *arg)
 {
 
 	for(;;) {
-		tello_get_battery();
-		msleep(10000);
-		tello_get_height();
-		msleep(10000);
-	        tello_flight_time();
+		tello_get_wifi_snr();
 		msleep(10000);
 	}
 
@@ -164,7 +178,36 @@ static void key_up(SDL_Keycode key)
 
 static void key_down(SDL_Keycode key) 
 {
-
+   if(( key>=SDLK_a && key<=SDLK_z) || (key>=SDLK_0 && key<=SDLK_9) || key==SDLK_SPACE || key==SDLK_MINUS || key==SDLK_PLUS) {
+      console_addkeypress(key);
+   }
+   if(key==SDLK_BACKSPACE) console_backspace();
+   if(key==SDLK_RETURN) {
+      tello_cmd_t cmd = console_get_command();
+      printf("cmd=%d\n", cmd);
+      switch(cmd) {
+        case TELLO_TAKEOFF:
+          tello_takeoff();
+          break;
+        case TELLO_LAND:
+          tello_land();
+          break;
+        case RENDER_BW:
+          render_bw();
+          break;
+        case RENDER_GREEN:
+          render_green();
+          break;
+        case TELLO_STREAM_OFF:
+          tello_stream_off();
+          break;
+        case TELLO_STREAM_ON:
+          tello_stream_on();
+          break;
+        default:
+          fprintf(stderr, "not supported yet");
+      }
+   }
 }
 int main(int argc, char **argv)
 {
@@ -176,7 +219,7 @@ int main(int argc, char **argv)
 //	  exit(-1);
   //}
   decoder_init();
-  tello_init((const char *)"192.168.10.1", 8889, 11111);
+  tello_init((const char *)"192.168.10.1", 8889, 11111, 8890);
   tello_stream_on();
   thread_start(handle_joy, NULL);
   thread_start(handle_stats, NULL);

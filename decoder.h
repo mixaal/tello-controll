@@ -30,6 +30,8 @@ extern "C" {
 }
 #endif
 
+void render_green(void);
+void render_bw(void);
 void decoder_init(void);
 void decoder_destroy(void);
 bool decoder_is_frame_available(void);

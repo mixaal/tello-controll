@@ -39,12 +39,13 @@ if [ "$OS" = "Linux" ] ; then
 fi
 
 if [ "$OS" = "Darwin" ] ; then
-   brew install sdl2 sdl2_image sdl2_mixer sdl2_sound sdl2_gfx
+   brew install sdl2 sdl2_image sdl2_mixer sdl2_sound sdl2_gfx sdl2_ttf
    getlib libSDL2
    getlib libSDL2_image
    getlib libSDL2_mixer
    getlib libSDL2_sound
    getlib libSDL2_gfx
+   getlib libSDL2_ttf
    addinc SDL.h
 
 

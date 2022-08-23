@@ -7,6 +7,7 @@
 #include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 typedef void (*render_func_t)(void) ;
 typedef void (*kbd_func_t)(SDL_Keycode key) ;
@@ -42,4 +43,5 @@ SDL_Texture *create_texture(int w, int h);
 void sdl_battery_status(int power);
 void sdl_wifi_signal_strength(int strength);
 void sdl_draw_box(int x, int y, int w, int h, int r, int g, int b);
+void sdl_text(const char *message, int x, int y, int w, int h);
 #endif /* __NN_SDL_H__ */

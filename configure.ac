@@ -81,6 +81,12 @@ AC_CHECK_LIB(SDL2_mixer,  main, [], [
    exit -1
 ])
 
+AC_CHECK_LIB(SDL2_ttf,  main, [], [
+   echo "Error - you need sdl2 ttf lib!"
+   exit -1
+])
+
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 

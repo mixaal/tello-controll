@@ -50,6 +50,16 @@ tello_cmd_t console_get_command(void)
    if(iscmd("bw"))      cmd = RENDER_BW;
    if(iscmd("streamon")) cmd = TELLO_STREAM_ON;
    if(iscmd("streamoff")) cmd = TELLO_STREAM_OFF;
+
+   if(iscmd("up")) cmd = TELLO_UP;
+   if(iscmd("down")) cmd = TELLO_DOWN;
+   if(iscmd("left")) cmd = TELLO_LEFT;
+   if(iscmd("right")) cmd = TELLO_RIGHT;
+   if(iscmd("fwd")) cmd = TELLO_FORWARD;
+   if(iscmd("back")) cmd = TELLO_BACKWARD;
+   if(iscmd("cw")) cmd = TELLO_CW;
+   if(iscmd("ccw")) cmd = TELLO_CCW;
+
    console_reset();
    return cmd;
 }

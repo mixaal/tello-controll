@@ -13,7 +13,7 @@
 #include "decoder.h"
 
 static tello_config_t tello_config = { 8889, 8890, (char*)"192.168.10.1", 0.3f, 0, 11111 };
-static const char *tello_state_cmd = "pitch:%d;roll:%d;yaw:%d;vgx:%d;vgy%d;vgz:%d;templ:%d;temph:%d;tof:%d;h:%d;bat:%d;baro:%.2f;time:%d;agx:%.2f;agy:%.2f;agz:%.2f;\r\n";
+static const char *tello_state_cmd = "pitch:%d;roll:%d;yaw:%d;vgx:%d;vgy:%d;vgz:%d;templ:%d;temph:%d;tof:%d;h:%d;bat:%d;baro:%f;time:%d;agx:%f;agy:%f;agz:%f;\r\n";
 
 static int comm_socket;
 static int video_socket;
@@ -160,28 +160,29 @@ void * state_receive_thread(void *a)
 		fprintf(stderr, "state: nbytes=%ld\n", nbytes);
 		if(nbytes>0) {
 			// Decode stuff
-			fprintf(stderr, "state received: %ld bytes of communication\n", nbytes);
+			fprintf(stderr, "state: %ld bytes of communication\n", nbytes);
 			char *response = new_string_sz(buf, nbytes);
 			chomp(response);
 			printf("*** STATE: %s\n", response);
                         sscanf(response, tello_state_cmd, 
-                                   &tello_state.pitch,
-                                   &tello_state.roll,
-                                   &tello_state.yaw,
-                                   &tello_state.vgx,
-                                   &tello_state.vgy,
-                                   &tello_state.vgz,
-                                   &tello_state.templ,
-                                   &tello_state.temph,
-                                   &tello_state.tof,
-                                   &tello_state.height,
-                                   &tello_state.battery,
-                                   &tello_state.alt,
-                                   &tello_state.flight_time,
-                                   &tello_state.agx,
-                                   &tello_state.agy,
-                                   &tello_state.agz);
-			fprintf(stderr, "received: |%s|\n", response);
+                                   &(tello_state.pitch),
+                                   &(tello_state.roll),
+                                   &(tello_state.yaw),
+                                   &(tello_state.vgx),
+                                   &(tello_state.vgy),
+                                   &(tello_state.vgz),
+                                   &(tello_state.templ),
+                                   &(tello_state.temph),
+                                   &(tello_state.tof),
+                                   &(tello_state.height),
+                                   &(tello_state.battery),
+                                   &(tello_state.alt),
+                                   &(tello_state.flight_time),
+                                   &(tello_state.agx),
+                                   &(tello_state.agy),
+                                   &(tello_state.agz));
+			fprintf(stderr, "state: |%s|\n", response);
+                        fprintf(stderr, "bat: %d\n", tello_state.battery);
 			free(response);
 		}
 
@@ -223,7 +224,7 @@ void * video_receive_thread(void *a)
 				video_len = 0;
 			}
 			// Decode stuff
-			//fprintf(stderr, "received: %ld bytes of video\n", nbytes);
+			//fprintf(stderr, "video: %ld bytes of video\n", nbytes);
 
 		}
 	}
@@ -263,11 +264,11 @@ void * comm_receive_thread(void *a)
                                 sscanf(response, "%ddm", &tello_height);
 				printf("Height: %s\n", response);
 			}
-			if(only_digits(response)) {
-				printf("Battery: %s\n", response);
-				tello_battery_power = atoi(response);
-			}
 #endif
+			if(only_digits(response)) {
+				printf("SNR value: %s\n", response);
+				tello_state.wifi_snr = atoi(response);
+			}
 			fprintf(stderr, "received: |%s|\n", response);
 			free(response);
 		}

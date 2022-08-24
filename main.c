@@ -35,7 +35,7 @@ static void tello_state_render(void)
 static void render_func(void)
 {
 	sdl_battery_status(tello_state.battery);
-	sdl_wifi_signal_strength(-65);
+	sdl_wifi_signal_strength(tello_state.wifi_snr);
 	if(frame_data!=NULL && tex!=NULL) {
             sdl_render_texture(tex, frame_data, frame_data_width, frame_data_height, SCR_W, SCR_H);
 	}
@@ -161,7 +161,7 @@ static void *handle_stats(void *arg)
 
 	for(;;) {
 		tello_get_wifi_snr();
-		msleep(10000);
+		msleep(2000);
 	}
 
 
@@ -203,6 +203,30 @@ static void key_down(SDL_Keycode key)
           break;
         case TELLO_STREAM_ON:
           tello_stream_on();
+          break;
+        case TELLO_UP:
+	  tello_move("up", 0.2f);
+          break;
+        case TELLO_DOWN:
+	  tello_move("down", 0.2f);
+          break;
+        case TELLO_LEFT:
+	  tello_move("left", 0.2f);
+          break;
+        case TELLO_RIGHT:
+	  tello_move("right", 0.2f);
+          break;
+        case TELLO_FORWARD:
+	  tello_move("forward", 0.2f);
+          break;
+        case TELLO_BACKWARD:
+	  tello_move("back", 0.2f);
+          break;
+        case TELLO_CCW:
+	  tello_rotate_ccw(90);
+          break;
+        case TELLO_CW:
+	  tello_rotate_cw(90);
           break;
         default:
           fprintf(stderr, "not supported yet");

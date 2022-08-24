@@ -28,6 +28,8 @@ typedef struct {
    float alt;
    int flight_time;
    float agx, agy, agz;
+
+   int wifi_snr; // wifi signal to noise ratio as reported by drone to wifi? command
 } tello_state_t;
 
 void tello_init(const char *tello_ip, int tello_port, int video_port, int tello_state_port);

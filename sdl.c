@@ -442,19 +442,19 @@ void sdl_wifi_signal_strength(int strength)
 	int r=255, g=255, b=255;
 	int or=255, og=255, ob=255;
         int draw_white = 4;
-	if(strength<-67) {
+	if(strength<25) {
 		if(sdl_blink) return; // don't draw anything
 		draw_white = 0;
 		or = 255; og = ob = 0;
 	}
-	if(strength>=-67 && strength<-60) {
+	if(strength>=25 && strength<40) {
 		if(sdl_blink) return; // don't draw anything
 		draw_white = 1;
 		or = 255; og = ob = 0;
 		r = 255; g = b = 0;
 	}
-	if(strength>=-60 && strength<-50) draw_white = 2;
-	if(strength>=-50 && strength<-40) draw_white = 3;
+	if(strength>=40 && strength<60) draw_white = 2;
+	if(strength>=60 && strength<80) draw_white = 3;
 	for (int i=0; i<4; i++) {
 	   if(i<draw_white) {
 	      sdl_draw_rect(xx, y, w, hh, r, g, b);

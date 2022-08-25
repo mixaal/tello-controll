@@ -11,6 +11,8 @@
 #include "utils.h"
 #include "decoder.h"
 
+//#define DUMP_VIDEO 1
+
 static tello_config_t tello_config = { 8889, 8890, (char*)"192.168.10.1", 0.3f, 0, 11111 };
 static const char *tello_state_cmd = "pitch:%d;roll:%d;yaw:%d;vgx:%d;vgy:%d;vgz:%d;templ:%d;temph:%d;tof:%d;h:%d;bat:%d;baro:%f;time:%d;agx:%f;agy:%f;agz:%f;\r\n";
 
@@ -224,7 +226,7 @@ void * video_receive_thread(void *a)
 		if(nbytes<0) {
 			perror("video recv():");
 		}
-		fprintf(stderr, "video: nbytes=%ld\n", nbytes);
+		//fprintf(stderr, "video: nbytes=%ld\n", nbytes);
 		if(nbytes>=0) {
 
 #ifdef DUMP_VIDEO

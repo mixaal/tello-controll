@@ -31,6 +31,7 @@ extern "C" {
 }
 #endif
 
+void render_night(void);
 void render_green(void);
 void render_bw(void);
 void render_enhance(void);

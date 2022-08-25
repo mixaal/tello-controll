@@ -204,6 +204,9 @@ static void key_down(SDL_Keycode key)
         case RENDER_ENHANCE:
           render_enhance();
           break;
+        case RENDER_NIGHT:
+          render_night();
+          break;
         case TELLO_STREAM_OFF:
           tello_stream_off();
           break;

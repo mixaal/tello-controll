@@ -50,6 +50,7 @@ tello_cmd_t console_get_command(void)
    if(iscmd("bw"))      cmd = RENDER_BW;
    if(iscmd("rgb"))     cmd = RENDER_RGB;
    if(iscmd("enhance")) cmd = RENDER_ENHANCE;
+   if(iscmd("night"))   cmd = RENDER_NIGHT;
    if(iscmd("streamon")) cmd = TELLO_STREAM_ON;
    if(iscmd("streamoff")) cmd = TELLO_STREAM_OFF;
 

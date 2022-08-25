@@ -1,14 +1,20 @@
 #include "decoder.h"
 #include "utils.h"
 #include "sdl.h"
+#include "imgproc.h"
 
 unsigned char *frame_data = NULL;
 int frame_data_width, frame_data_height;
 static sync_t frame_access_lock;
+static unsigned char *temp_frame_data = NULL;
 
-typedef enum { RMODE_GREEN, RMODE_BW, RMODE_RGB } render_mode_t;
+typedef enum { RMODE_GREEN, RMODE_BW, RMODE_RGB, RMODE_ENHANCE } render_mode_t;
 static render_mode_t render_mode = RMODE_BW;
 
+void render_enhance(void)
+{
+  render_mode = RMODE_ENHANCE;
+}
 
 void render_green(void)
 {
@@ -107,6 +113,7 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
     int format = frame->format;
     printf("format=%d\n", format);
     //frame_access_gain();
+    if(temp_frame_data == NULL) temp_frame_data = (unsigned char *)xmalloc(xsize * ysize * 3);
     if(frame_data == NULL) {
       frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
       frame_data_width = xsize;
@@ -115,9 +122,11 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
       if(xsize!=frame_data_width || ysize!=frame_data_height) {
         fprintf(stderr, "resolution has changed from %dx%d -> %dx%d\n", frame_data_width, frame_data_height, xsize, ysize);
         free(frame_data);
+        if (temp_frame_data!=NULL) free(temp_frame_data);
         frame_data_width = xsize;
         frame_data_height = ysize;
         frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
+        temp_frame_data = (unsigned char *)xmalloc(xsize*ysize*3);
       }
     }
 
@@ -181,6 +190,11 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
             frame_data[dst++] = G;
             frame_data[dst++] = B;
             break;
+          case RMODE_ENHANCE:
+            temp_frame_data[dst++] = R;
+            temp_frame_data[dst++] = G;
+            temp_frame_data[dst++] = B;
+            break;
           case RMODE_GREEN:
             frame_data[dst++] = 0; 
             frame_data[dst++] = Y;
@@ -189,6 +203,11 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
         }
       }
     }
+    if(render_mode==RMODE_ENHANCE) {
+        //dark_channel(temp_frame_data, NULL, NULL, frame_data, xsize, ysize, 15);
+       enhance_naive(temp_frame_data, NULL, frame_data, xsize, ysize, 15);
+    }
+ 
     //frame_access_release();
     return frame;
   } else {
@@ -210,6 +229,7 @@ static AVFrame* decoder_decode_frame(void)
 
 void decode(const char *data_in, ssize_t len)
 {
+
 
   while (len > 0)
   {

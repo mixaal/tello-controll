@@ -33,6 +33,7 @@ extern "C" {
 
 void render_green(void);
 void render_bw(void);
+void render_enhance(void);
 void render_rgb(void);
 void decoder_init(void);
 void decoder_destroy(void);

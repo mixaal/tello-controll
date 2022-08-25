@@ -3,7 +3,7 @@ CC=gcc
 FLAGS=-O2 -ggdb -pedantic -Wall -Werror -Wno-deprecated-declarations   -I/opt/homebrew/Cellar//sdl2/2.24.0/include -I/opt/homebrew/Cellar//sdl2_image/2.6.2/include -I/opt/homebrew/Cellar//sdl2_mixer/2.6.2/include -I/opt/homebrew/Cellar//sdl2_sound/2.0.1/include -I/opt/homebrew/Cellar//sdl2_gfx/1.0.4/include -I/opt/homebrew/Cellar//sdl2_ttf/2.20.1/include -I/opt/homebrew/Cellar/sdl2/2.24.0/include/SDL2 -I/Users/mconos/libav/include
 NO_PEDANTIC_FLAGS=-O2 -ggdb -Wall -Werror -Wno-deprecated-declarations 
 RM=rm -f
-OBJECTS=tello.o main.o utils.o decoder.o sdl.o joy.o wifi_scan.o console.o  # wireless.o 
+OBJECTS=tello.o main.o utils.o decoder.o sdl.o joy.o wifi_scan.o console.o imgproc.o # wireless.o 
 MAIN=tello_control
 LIBS=-lSDL2_ttf -lSDL2_mixer -lSDL2_image -lSDL2 -lpthread -lavutil -lswscale -lavresample -lavfilter -lavcodec -lz -lm 
 
@@ -20,6 +20,8 @@ wifi_scan.o: wifi_scan.c
 console.o: console.c
 	$(CC) $(FLAGS) -c -o $@ $<
 
+imgproc.o: imgproc.c
+	$(CC) $(FLAGS) -c -o $@ $<
 
 joy.o: joy.c
 	$(CC) $(FLAGS) -c -o $@ $<

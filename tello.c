@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <math.h>
@@ -197,6 +196,19 @@ return NULL;
 }
 
 
+#ifdef DUMP_VIDEO
+static void dump_bytes(char *buffer, ssize_t len) 
+{
+  FILE *fp = fopen("dump.data", "ab");
+  if(fp!=NULL) {
+     fwrite(&len, sizeof(ssize_t), 1, fp);
+     fwrite(buffer, 1, len, fp);
+     fclose(fp);
+  }
+}
+#endif
+
+
 #if defined( __cplusplus) && defined(HAVE_THREADS_H)
 int video_receive_thread(void *a)
 #else
@@ -210,10 +222,14 @@ void * video_receive_thread(void *a)
 	for(int counter=0;;counter++) {
 		ssize_t nbytes = recv(video_socket, buf, 2048, 0);
 		if(nbytes<0) {
-			perror("comm recv():");
+			perror("video recv():");
 		}
-		//fprintf(stderr, "video: nbytes=%ld\n", nbytes);
+		fprintf(stderr, "video: nbytes=%ld\n", nbytes);
 		if(nbytes>=0) {
+
+#ifdef DUMP_VIDEO
+                       dump_bytes(buf, nbytes);
+#endif /* DUMP_VIDEO */
 			memcpy(frame_data + video_len, buf, nbytes);
 			video_len+=nbytes;
 			if(nbytes!=1460) {

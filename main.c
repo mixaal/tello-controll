@@ -201,6 +201,9 @@ static void key_down(SDL_Keycode key)
         case RENDER_GREEN:
           render_green();
           break;
+        case RENDER_ENHANCE:
+          render_enhance();
+          break;
         case TELLO_STREAM_OFF:
           tello_stream_off();
           break;
@@ -246,7 +249,8 @@ int main(int argc, char **argv)
 //	  exit(-1);
   //}
   decoder_init();
-  tello_init((const char *)"192.168.10.1", 8889, 11111, 8890);
+  //tello_init((const char *)"192.168.10.1", 8889, 11111, 8890);
+  tello_init((const char *)"127.0.0.1", 8889, 11111, 8890);
   tello_stream_on();
   thread_start(handle_joy, NULL);
   thread_start(handle_stats, NULL);

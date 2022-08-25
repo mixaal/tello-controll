@@ -192,6 +192,9 @@ static void key_down(SDL_Keycode key)
         case TELLO_LAND:
           tello_land();
           break;
+        case RENDER_RGB:
+          render_rgb();
+          break;
         case RENDER_BW:
           render_bw();
           break;

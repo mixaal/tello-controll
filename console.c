@@ -48,6 +48,7 @@ tello_cmd_t console_get_command(void)
    if(iscmd("land"))    cmd = TELLO_LAND;
    if(iscmd("green"))   cmd = RENDER_GREEN;
    if(iscmd("bw"))      cmd = RENDER_BW;
+   if(iscmd("rgb"))     cmd = RENDER_RGB;
    if(iscmd("streamon")) cmd = TELLO_STREAM_ON;
    if(iscmd("streamoff")) cmd = TELLO_STREAM_OFF;
 

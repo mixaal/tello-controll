@@ -24,7 +24,7 @@ static int font_height = 20;
 static void tello_state_render(void)
 {
         char msg[4096];
-        snprintf(msg, 256, "ALT: %.2f     H:%d     TEMPL:%d     TEMPH:%d       TIME:%d        TOF:%d", tello_state.alt, tello_state.height, tello_state.templ, tello_state.temph, tello_state.flight_time, tello_state.tof);
+        snprintf(msg, 256, "ALT: %.2f     H:%d     TEMPL:%d     TEMPH:%d       TIME:%d        TOF:%d        BAT:%d", tello_state.alt, tello_state.height, tello_state.templ, tello_state.temph, tello_state.flight_time, tello_state.tof, tello_state.battery);
         sdl_text(msg, 140, 20, strlen(msg)*font_width, font_height);
         snprintf(msg, 256, "VGX: %d VGY:%d VGZ:%d          AGX:%.2f AGY:%.2f AGZ:%.2f", tello_state.vgx, tello_state.vgy, tello_state.vgz, tello_state.agx, tello_state.agy, tello_state.agz);
         sdl_text(msg, 140, 50, strlen(msg)*font_width, font_height);

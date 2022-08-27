@@ -208,7 +208,7 @@ static AVFrame *decode_frame_impl(const char *data_in, ssize_t len, ssize_t *num
       }
     }
     if(render_mode==RMODE_NIGHT) {
-       dark_channel(temp_frame_data, NULL, NULL, frame_data, xsize, ysize, 15);
+       dark_channel(temp_frame_data, NULL, NULL, NULL, frame_data,  xsize, ysize, 15);
     }
     if(render_mode==RMODE_ENHANCE) {
        //enhance_naive(temp_frame_data, NULL, frame_data, xsize, ysize, 15);

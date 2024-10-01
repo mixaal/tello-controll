@@ -96,7 +96,7 @@ char *new_string(const char *src)
 		fprintf(stderr, "Can't pass null as new string!\n");
 		exit(-1);
 	}
-	char *x = (char *)xmalloc(strlen(src));
+	char *x = (char *)xmalloc(1+strlen(src));
 	strcpy(x, src);
 	return x;
 }
